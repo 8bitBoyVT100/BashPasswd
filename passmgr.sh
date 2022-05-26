@@ -163,6 +163,7 @@ keyword=${checkword,,} # ==> turing it into lowercase
 #==================================================[ Saved GPG Keys ]========================================================
 # list all encrypted gpg files, [ the vault ]
 list_service () {
+    checkdir
     clear
     wlist
     printf "\e[0m\e[1;91m---------------------\e[0m \n"
