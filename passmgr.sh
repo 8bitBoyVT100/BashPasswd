@@ -2,39 +2,23 @@
 
 # Welcome message
 welcome (){
-    printf "\e[0m\e[1;91m----------------------------------\e[0m \n"
-    printf "\e[0m\e[1;91m|\e[0m\en Welcome to GPG PasswordManager \e[0m\e[1;91m|\e[0m\n"
-    printf "\e[0m\e[1;91m----------------------------------\e[0m \n"
+    printf "\e[1;91m+----------------------------------+\e[0m\n"
+    printf "\e[1;91m|\e[0m Welcome to GPG PasswordManager\e[1;91m   |\e[0m\n"
+    printf "\e[1;91m+----------------------------------+\e[0m\n"
 }
 
-wencrypt(){
-    printf "\e[0m\e[1;92m######################\e[0m \n"
-    printf "\e[0m\e[1;92m#\e[0m\en\tEncrypt\e[0m\e[1;92m      #\e[0m\n"
-    printf "\e[0m\e[1;92m######################\e[0m \n"
+# Welcome message displayer for encrypt and decrpt options
+wcrypt(){
+    printf "\e[1;92m+-----------------------+\n"
+    printf "\e[1;92m|\e[0m\t$1\e[1;92m \t|\n"
+    printf "\e[1;92m+-----------------------+\e[0m\n"
 }
 
-wdecrypt(){
-    printf "\e[0m\e[1;95m#######################\e[0m \n"
-    printf "\e[0m\e[1;95m#\e[0m\en\tDecrypt\e[0m\e[1;95m       #\e[0m\n"
-    printf "\e[0m\e[1;95m#######################\e[0m \n"
-}
-
-wabout (){
-    printf "\e[0m\e[1;32m######################\e[0m \n"
-    printf "\e[0m\e[1;32m#\e[0m\en\tAbout\e[0m\e[1;32m        #\e[0m\n"
-    printf "\e[0m\e[1;32m######################\e[0m \n"
-}
-
-whelp (){
-    printf "\e[0m\e[33m######################\e[0m \n"
-    printf "\e[0m\e[33m#\e[0m\en\tHelp\e[0m\e[33m         #\e[0m\n"
-    printf "\e[0m\e[33m######################\e[0m \n"
-}
-
-wlist (){
-    printf "\e[0m\e[1;33m####################\e[0m \n"
-    printf "\e[0m\e[1;33m#\e[0m\en\tVault\e[0m\e[1;33m      #\e[0m\n"
-    printf "\e[0m\e[1;33m####################\e[0m \n"
+# Welcome message displayer for  vault, about and help options
+wmisc (){
+    printf "\e[1;32m+--------------------+\e[0m\n"
+    printf "\e[1;32m|\e[0m\t $1\e[1;32m \t     |\n"
+    printf "\e[1;32m+--------------------+\e[0m \n"
 }
 
 #==============================================================[ Options ]======================================================
@@ -42,44 +26,43 @@ wlist (){
 options () {
     clear
     welcome
-    printf "\e[1;92m[\e[0m\e[1;77m01\e[0m\e[1;92m]\e[0m\e[1;91m Encrypt\e[0m      \e[1;92m[\e[0m\e[1;77m02\e[0m\e[1;92m]\e[0m\e[1;91m Decrypt\e[0m \n"
-    printf "\e[1;92m[\e[0m\e[1;77m03\e[0m\e[1;92m]\e[0m\e[1;91m About\e[0m        \e[1;92m[\e[0m\e[1;77m04\e[0m\e[1;92m]\e[0m\e[1;91m Help\e[0m \n"
-    printf "\e[1;92m[\e[0m\e[1;77m05\e[0m\e[1;92m]\e[0m\e[1;91m Vault\e[0m        \e[1;92m[\e[0m\e[1;77m06\e[0m\e[1;92m]\e[0m\e[1;91m Exit\e[0m \n"
+    printf "\e[1;92m[\e[0m\e[1m01\e[1;92m]\e[1;91m Encrypt\t  \e[1;92m[\e[0m\e[1m02\e[1;92m]\e[1;91m Decrypt\e[0m\n"
+    printf "\e[1;92m[\e[0m\e[1m03\e[1;92m]\e[1;91m About        \e[1;92m[\e[0m\e[1m04\e[1;92m]\e[1;91m Help\e[0m\n"
+    printf "\e[1;92m[\e[0m\e[1m05\e[1;92m]\e[1;91m Vault        \e[1;92m[\e[0m\e[1m06\e[1;92m]\e[1;91m Exit\e[0m\n"
 
-    read -p $'\n\e[1;92m[\e[0m\e[1;77m*\e[0m\e[1;92m] Choose an option: \e[0m\en' option 
+    read -p $'\n\e[1;92m[\e[0m\e[1m*\e[1;92m] Choose an option: \e[0m\en' option 
 
     if [[ $option == 1 || $option == 01 ]] 
     then
-        check_encrypt
+      check_encrypt
     elif [[ $option == 2 || $option == 02 ]] 
     then
-        check_decrypt
+      check_decrypt
     elif [[ $option == 3 || $option == 03 ]] 
     then
-        about
+      about_page
     elif [[ $option == 4 || $option == 04 ]] 
     then
-        help
+      help_page
     elif [[ $option == 5 || $option == 05 ]] 
     then
-        list_service
+      list_service
     elif [[ $option == 6 || $option == 06 ]] 
     then
-        exit
+      exit
     else
-        echo "[*] Invalid input. Exiting... "
-        sleep 1
-        exit 0
+      echo "[*] Invalid input. Exiting... "
+      sleep 1
+      exit 0
     fi
 }
 
 #===============================================[ List Manager ]=====================================================
 
 manager () {
-    printf "==============================\n"
-    printf "\e[1;92m[\e[0m\e[1;77m01\e[0m\e[1;92m]\e[0m\e[1;91m Decrypt\e[0m      \e[1;92m[\e[0m\e[1;77m02\e[0m\e[1;92m]\e[0m\e[1;91m Remove\e[0m\n"
 
-    read -p $'\n\e[1;92m[\e[0m\e[1;77m*\e[0m\e[1;92m] Choose an option: \e[0m\en' mtion
+    printf "\n\e[1;92m[\e[0m\e[1m01\e[1;92m]\e[1;91m Decrypt      \e[1;92m[\e[0m\e[1m02\e[0m\e[1;92m]\e[1;91m Remove\e[0m\n"
+    read -p $'\n\e[1;92m[\e[0m\e[1m*\e[1;92m] Choose an option: \e[0m\en' mtion
 
     if [[ $mtion == 1 || $mtion == 01 ]] 
     then
@@ -157,28 +140,34 @@ echo ""
 printf "[*]\e[0m\e[1;36m Enter the Keyword for the Service:\e[0m "
 # ==> Will implement array, rather than a normal variable in future
 read checkword
-keyword=${checkword,,} # ==> turing it into lowercase 
+keyword=${checkword,,} # ==> turning it into lowercase 
 }
 
-#==================================================[ Saved GPG Keys ]========================================================
-# list all encrypted gpg files, [ the vault ]
+#===============[ Listing Saved GPG Keys ]=================
+
+# list all encrypted gpg files in Passwords directory aka the vault
 list_service () {
     checkdir
     clear
-    wlist
-    printf "\e[0m\e[1;91m---------------------\e[0m \n"
-    ls ./Passwords/ > tmp.txt && awk 'BEGIN{ORS="\n"} {print NR,$0}' tmp.txt && rm tmp.txt
-    printf "\e[0m\e[1;91m---------------------\e[0m \n"
-    manager
+    wmisc Vault
+    printf "\e[1;91m+-----------------------+\e\n |\t\t\t|\n"
+    array=($(ls ./Passwords/ | sed -e "s/.gpg//g"))
+    let num_of_service=1
+    for service in "${array[@]}"
+    do
+      printf "| \e[1;32m$num_of_service. \e[0m$service\e[1;91m \t\t|\n"
+      let num_of_service++
+    done
+    printf "|\t\t\t|\n\e[1;91m+-----------------------+\e\n"
+   manager
 }
-#===============================================================================================================================
 
-#======================================================[ Encryption ]========================================================
+#====================[ Encryption ]======================
 
 # Checks wheather the service or the file related to it exist or not
 check_encrypt (){
 clear
-wencrypt
+wcrypt Encrypt
 get_service
 if [ -f "./Passwords/$keyword.gpg" ]
 then
@@ -255,12 +244,11 @@ encryption () {
     esac
 }
 
-#=======================================================[ Encrytion END ]======================================================
-
-#=======================================================[ Decryption ]==========================================================
+#============[ Decryption ]=================
+#
 check_decrypt () {
     clear
-    wdecrypt
+    wcrypt Decrypt
     get_service
     
     if [ -f "./Passwords/$keyword.gpg" ]
@@ -316,20 +304,19 @@ decrytion () {
             options
         esac
 }
-#=======================================================[ Decrytion END ]======================================================
 
 #===============================================[ About ]================================================
 
-about() {
+about_page() {
     clear
-    wabout
+    wmisc About
     cat about.txt
     enter_to_continue
 }
 
-help () {
+help_page() {
     clear
-    whelp
+    wmisc Help
     cat help.txt
     enter_to_continue
 }
