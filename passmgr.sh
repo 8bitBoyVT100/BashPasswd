@@ -32,6 +32,7 @@ options () {
 
     read -p $'\n\e[1;92m[\e[0m\e[1m*\e[1;92m] Choose an option: \e[0m\en' option 
 
+    # Case Statement can be used instead of if else 
     if [[ $option == 1 || $option == 01 ]] 
     then
       check_encrypt
@@ -49,31 +50,34 @@ options () {
       list_service
     elif [[ $option == 6 || $option == 06 ]] 
     then
+      echo "[*] Good Bye"
       exit
     else
-      echo "[*] Invalid input. Exiting... "
+      echo "[*] Invalid input. Reloading... "
       sleep 1
-      exit 0
+      options
     fi
 }
 
-#===============================================[ List Manager ]=====================================================
+#===============[ List Manager ]================
 
 manager () {
 
     printf "\n\e[1;92m[\e[0m\e[1m01\e[1;92m]\e[1;91m Decrypt      \e[1;92m[\e[0m\e[1m02\e[0m\e[1;92m]\e[1;91m Remove\e[0m\n"
-    read -p $'\n\e[1;92m[\e[0m\e[1m*\e[1;92m] Choose an option: \e[0m\en' mtion
+    read -p $'\n\e[1;92m[\e[0m\e[1m*\e[1;92m] Choose an option: \e[0m\en' opt
 
-    if [[ $mtion == 1 || $mtion == 01 ]] 
+    if [[ $opt == 1 || $opt == 01 ]] 
     then
-        check_decrypt
-    elif [[ $mtion == 2 || $mtion == 02 ]] 
+        check_decrypt C # C for child
+    elif [[ $opt == 2 || $opt == 02 ]] 
     then
         get_service
         if [[ -f "./Passwords/$keyword.gpg" ]]
         then
-            printf "[*] Are you sure you want to delete\e[1;92m $keyword.gpg\e[0m? [y/N]: "
+            printf "[*] Are you sure you want to delete\e[1;92m $keyword\e[0m? [y/N]: "
             read rcheck
+            # Services can be choosed based on the numbers it stands in the vault to either decrypt of removed 
+            # But since they are shorted according to name, a logic is need, but that's for future
             case $rcheck in
                 [yY]* )
                     rm "./Passwords/$keyword.gpg"
@@ -81,19 +85,16 @@ manager () {
                     echo "[*] Refreshing.."
                     sleep 1.5
                     list_service;;
-                [nN]* )
+                [nN]* | * )
                     echo "[*] Aborted.."
                     list_service;;
-                * )
-                    echo "[*] Aborted.."
-                    list_service
             esac
         else
         echo "[*] Service not found. Refreshing"
         sleep 1.5
         list_service
         fi
-    elif [[ $mtion == "" ]] 
+    elif [[ $opt == "" ]] 
     then
     echo "[*] Hold your horse..."
         sleep 1
@@ -106,18 +107,25 @@ manager () {
 }
 # what="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 
-#====================================================[ Continue Function ]========================================
+#==============[ Continue Function ]===============
+
 enter_to_continue (){
     printf "\n[*] Press enter to continue... "
     read enter 
     if [[ $enter == "" ]]
     then
-    options
-    else
+      if [[ $1 == "E" ]]
+      then
+        check_encrypt
+      elif [[ $1 == "DV" ]]
+      then
+        list_service
+      fi
     options
     fi
 }
-#============================================================================================================
+
+#========================[ Password Directory Check ]========================
 
 # Passwords Directory Check
 checkdir (){
@@ -132,20 +140,22 @@ checkdir (){
     fi
 }
 
-#=========================================================[ Servies ]==================================================
+#================[ Servies ]=============
+
 # Get the name of the service
 get_service (){
 checkdir
 echo ""
 printf "[*]\e[0m\e[1;36m Enter the Keyword for the Service:\e[0m "
-# ==> Will implement array, rather than a normal variable in future
-read checkword
-keyword=${checkword,,} # ==> turning it into lowercase 
+# ==> An array can be implimented rather than taking a single input, but not sure how effiecient will that be 
+read keyword
+# keyword=${checkword,,} # ==> for turning the input it into lowercase, this can help if user input google, but there also pre-exist a file 
+# named Google, which might have same credentials, but this is irrelivent in normal basic usecase
 }
 
 #===============[ Listing Saved GPG Keys ]=================
 
-# list all encrypted gpg files in Passwords directory aka the vault
+# listing all encrypted gpg files in Passwords directory aka the vault
 list_service () {
     checkdir
     clear
@@ -153,11 +163,16 @@ list_service () {
     printf "\e[1;91m+-----------------------+\e\n |\t\t\t|\n"
     array=($(ls ./Passwords/ | sed -e "s/.gpg//g"))
     let num_of_service=1
-    for service in "${array[@]}"
-    do
-      printf "| \e[1;32m$num_of_service. \e[0m$service\e[1;91m \t\t|\n"
-      let num_of_service++
-    done
+    if [[ ${#array[@]} != 0 ]]
+    then
+      for service in "${array[@]}"
+      do
+        printf "| \e[1;32m$num_of_service. \e[0m$service\e[1;91m \t\t|\n"
+        let num_of_service++
+      done
+    else
+     printf "|\e[0m\e[1m Cricket Noice ! \e[1;91m\t|\n"
+    fi
     printf "|\t\t\t|\n\e[1;91m+-----------------------+\e\n"
    manager
 }
@@ -166,79 +181,89 @@ list_service () {
 
 # Checks wheather the service or the file related to it exist or not
 check_encrypt (){
+
 clear
 wcrypt Encrypt
 get_service
+
 if [ -f "./Passwords/$keyword.gpg" ]
 then
-    printf "[*]\e[0m\e[1;32m A common Service seems to exist, Plz check the Password folder\n\e[0m"
+    printf "[*]\e[0m\e[1;32m A similar Service named $keyword already seems to exist\n\e[0m"
     read -r -p "[*] Do you want to continue ? This may override the existing file [y/N]: " check
 
     case $check in
         [yY]* )
-        encryption;;
-        [nN]* )
+        encryption similar;;
+        [nN]* | * )
         echo "[*] Terminating Process..."
         sleep 1.2
-        options
-        exit 0;;
-        * )
-        echo "[*] Terminating Process..."
-        sleep 1.2
-        check_encrypt
-        exit 0;;
+        options;;
     esac
+
 elif [[ $keyword == "" ]]
 then
         echo "[*] No service was found."
         sleep 1
         options
 else
-    encryption
+    encryption 
 fi
 }
+
 encryption () {
-    printf "[*] Are you sure you want to create this service named\e[1;32m $keyword\e[0m? [y/N]: "
-    read chec2
+  
+    if [[ $1 != "similar" ]]
+    then
+      printf "[*] Are you sure you want to create this service named\e[1;32m $keyword\e[0m? [y/N]: "
+      read chec2
+    else
+      chec2="y"
+    fi
 
     case $chec2 in
     [yY]* )
         echo -n "[*] Enter the password for the service $keyword : "
         read -s passwd
+        if [[ $passwd == "" || $passwd == " "* ]]
+        then
+          printf "\n\n[*] \e[1;31mEmpty password not tolarable (╯°□°)╯︵ ┻━┻ \e[0m"
+          enter_to_continue E
+          check_encrypt
+        fi
         echo "" 
         echo -n "[*] Re-enter the password to confirm : "
         read -s passwd2
-        if [[ $passwd == $passwd2 && $passwd != "" && $passwd2 != " " ]]
+        if [[ $passwd == $passwd2 ]]
         then
-            printf "\n[*]\e[0m\e[1;92m password confirmed\e[0m\n"
-            echo "[*] Initializaing MasterKey Prompt...."
+            printf "\n[*]\e[1;92m password confirmed\e[0m\n"
+            printf "[*] Initializaing MasterKey Prompt...."
             sleep 2
-             # I will be implementinh base64 or other hases types later..
-             mkdir ./Passwords/tmp  && touch "./Passwords/tmp/$keyword" && echo $passwd2 > "./Passwords/tmp/$keyword"
-             gpg --cipher-algo AES-256 -c --no-symkey-cache  ./Passwords/tmp/$keyword && mv ./Passwords/tmp/*.gpg ./Passwords
-             rm -rf ./Passwords/tmp
-             # can be made simple, but for now it's ok
-                echo "[*] Key Saved. Initializing Main Menu..."
-                sleep 2
-                options
-        elif  [[ $passwd = ""  ||  $passwd2 = "" ]]
+
+            # I will be implementing base64 or other encrytion types later..
+            mkdir ./Passwords/tmp  && touch "./Passwords/tmp/$keyword" && echo $passwd2 > "./Passwords/tmp/$keyword"
+            gpg --cipher-algo AES-256 -c --no-symkey-cache  ./Passwords/tmp/$keyword && mv ./Passwords/tmp/*.gpg ./Passwords
+            rm -rf ./Passwords/tmp
+            # can be made simple or maybe much complex and secure, but for now it's ok =) 
+            
+            echo "[*] Key Saved. Initializing Main Menu..."
+            sleep 2
+            options
+        elif  [[ $passwd2 == "" || $passwd2 == " "* ]]
         then
-            echo -e "\n[*] Couldn't verify it as an apropriate password.."
+            echo -e "\n\n[*] Couldn't verify it as an apropriate password.."
             echo "[*] Process Terminated. Refreshing...."
-            sleep 2
+            enter_to_continue
             check_encrypt
         else
             printf "\n[*]\e[0m\e[1;91m Password doesn't match\e[0m\n"
-            enter_to_continue
-            echo "[*] Refreshing..."
-            sleep 0.5
+            enter_to_continue E
         fi ;;
     [nN]* )
         echo "[*] Process Terminated. Refreshing"
         sleep 0.5
         check_encrypt ;;
     * )
-        echo "[*] Process Terminated. Refreshing..."
+        echo "[*] NULL input, Terminating Process"
         sleep 0.5
         check_encrypt
     esac
@@ -247,9 +272,15 @@ encryption () {
 #============[ Decryption ]=================
 #
 check_decrypt () {
-    clear
-    wcrypt Decrypt
-    get_service
+  
+    if [[ $1 != "C" ]]
+    then
+      clear
+      wcrypt Decrypt
+      get_service
+    else
+      get_service
+    fi
     
     if [ -f "./Passwords/$keyword.gpg" ]
     then
@@ -258,13 +289,18 @@ check_decrypt () {
     then
         options
     else
-        printf "[*]\e[1;91m Unable to find the service $keyword in Passwords ( Plz Check it manually )\n\e[0m"
-        echo -n "[*] Do you want to check the services? [y/N]: "
+        printf "[*]\e[1;91m Unable to find the service $keyword in Vault\n\e[0m"
+        if [[ $1 != "C" ]]
+        then
+          echo -n "[*] Do you want to check stored services? [Y/n]: "
+        else
+          enter_to_continue DV # Decryption Vault
+        fi
         read scheck # service check
             case $scheck in
                 [yY]* )
                     echo "[*] Moving to Vault.."
-                    sleep 2
+                    sleep 1
                     clear
                     list_service;;
                 [nN]* )
@@ -272,14 +308,16 @@ check_decrypt () {
                     sleep 1
                     options;;
                 * )
-                    echo "[*] Exiting.."
+                    echo "[*] Moving to Vault.."
                     sleep 1
-                    options;;
+                    clear
+                    list_service;;
                 esac
     fi
 }
 
 decrytion () {
+
     echo "[*] Starting decrytion..."
     sleep 0.6
     printf "[*]\e[0m\e[1;32m Make sure no one is arround you, the password will be shown in plain text\n\e[0m"
@@ -289,38 +327,34 @@ decrytion () {
     case $view in
         [yY]* )    
             cat ./Passwords/$keyword.gpg | gpg --no-symkey-cache > .tmp
-            echo -ne "\n[*] Your password for $keyword is: \e[2m" 
-            cat .tmp && rm .tmp
-            echo -e "\e[0m"
+            echo -ne "\n[*] Your password for $keyword is: $(cat .tmp && rm .tmp)" 
+            # cat .tmp && rm .tmp
             enter_to_continue
             options ;;
-        [nN]* )
+        [nN]* | * )
             echo "\n[*] Be Safe. BYE =)"
             sleep 2
             options ;;
-        * )
-            echo "[*] Be Safe. BYE =)"
-            sleep 2
-            options
         esac
 }
 
-#===============================================[ About ]================================================
+#============[ About && Help ]==============
 
 about_page() {
     clear
     wmisc About
-    cat about.txt
+    cat ./src/about.txt
     enter_to_continue
 }
 
 help_page() {
     clear
     wmisc Help
-    cat help.txt
+    cat ./src/manual.txt
     enter_to_continue
 }
 
+# Initializing options as the Starting function
 options
 
 
